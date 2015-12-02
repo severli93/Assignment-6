@@ -55,11 +55,11 @@ queue()
             .append('g')
             .attr('class','state');
         nodes.exit().remove();
-
-        nodes
-            .attr('transform',function(d){
-                return 'translate('+d.x+','+d.y+')';
-            })
+        //
+        //nodes
+        //    .attr('transform',function(d){
+        //        return 'translate('+d.x+','+d.y+')';
+        //    })
         nodes
             .append('circle')
             .attr('r',function(d){
@@ -80,10 +80,79 @@ queue()
 
         //TODO: create a force layout
         //with what physical parameters?
+
+        //force layout
         var force = d3.layout.force()
+            .size([width,height])
+            .charge(-60)
+            .gravity(0);
+
+        force.nodes(data)
+            .on('tick',onForceTick)
+            .start();
+
+
         //on "tick" event ...
 
-	});
+        function onForceTick(e){
+            var q = d3.geom.quadtree(data),
+                i = 0,
+                n = data.length;
+
+            while( ++i<n ){
+                q.visit(collide(data[i]));
+            }
+
+            nodes
+                .each(gravity(e.alpha*.1))
+                .each(collide(.1))
+                .attr('transform',function(d){
+                    return 'translate('+d.x+','+d.y+')';
+                })
+            //.attr('cx',function(d){return d.x})
+            //.attr('cy',function(d){return d.y})
+
+            //k= e.alpha*.1  e.alpha changes from 1 to 0
+            function gravity(k){
+                //custom gravity: data points gravitate towards a straight line
+                return function(d){
+                    d.y += (d.y0 - d.y)*k;
+                    d.x += (d.x0 - d.x)*k;
+                }
+            }
+
+            //Collision detection
+
+            function collide(dataPoint){
+                var nr = dataPoint.r + 5,
+                    nx1 = dataPoint.x - nr,
+                    ny1 = dataPoint.y - nr,
+                    nx2 = dataPoint.x + nr,
+                    ny2 = dataPoint.y + nr;
+
+                return function(quadPoint,x1,y1,x2,y2){
+                    if(quadPoint.point && (quadPoint.point !== dataPoint)){
+                        var x = dataPoint.x - quadPoint.point.x,
+                            y = dataPoint.y - quadPoint.point.y,
+                            l = Math.sqrt(x*x+y*y),
+                            r = nr + quadPoint.point.r;
+                        if(l<r){
+                            l = (l-r)/l*.1;
+                            dataPoint.x -= x*= l;
+                            dataPoint.y -= y*= l;
+                            quadPoint.point.x += x;
+                            quadPoint.point.y += y;
+                        }
+                    }
+                    return x1>nx2 || x2<nx1 || y1>ny2 || y2<ny1;
+                }
+            }
+        }
+    });
+
+
+
+
 
 function parseData(d){
     //Use the parse function to populate the lookup table of states and their populations/% pop 18+
