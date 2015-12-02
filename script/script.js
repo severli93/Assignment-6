@@ -35,7 +35,7 @@ queue()
         //construct a new array of data
         var data = states.features.map(function(d){
             var centroid = path.centroid(d); //provides two numbers [x,y] indicating the screen coordinates of the state
-
+            console.log("d is",d)
             return {
                 fullName:d.properties.NAME,
                 state:d.properties.STATE,
@@ -48,7 +48,8 @@ queue()
         console.log(data);
 
 		var nodes = map.selectAll('.state')
-            .data(data, function(d){return d.state});
+            .data(data, function(d){return d.state
+            });
 
         //Represent as a cartogram of populations
         var nodesEnter = nodes.enter()
@@ -95,6 +96,7 @@ queue()
         //on "tick" event ...
 
         function onForceTick(e){
+            console.log(e)
             var q = d3.geom.quadtree(data),
                 i = 0,
                 n = data.length;
@@ -103,14 +105,7 @@ queue()
                 q.visit(collide(data[i]));
             }
 
-            nodes
-                .each(gravity(e.alpha*.1))
-                .each(collide(.1))
-                .attr('transform',function(d){
-                    return 'translate('+d.x+','+d.y+')';
-                })
-            //.attr('cx',function(d){return d.x})
-            //.attr('cy',function(d){return d.y})
+
 
             //k= e.alpha*.1  e.alpha changes from 1 to 0
             function gravity(k){
@@ -121,6 +116,19 @@ queue()
                 }
             }
 
+
+            nodes = map.selectAll('.state')
+            nodes
+                .each(gravity(e.alpha*(0.1)))
+                //.each(collide(.1))
+
+                .attr('transform',function(d){
+                    //console.log('here is d',d)
+                    if(d.state!="72"){return 'translate('+d.x+','+d.y+')';}
+
+                })
+            //.attr('cx',function(d){return d.x})
+            //.attr('cy',function(d){return d.y})
             //Collision detection
 
             function collide(dataPoint){
