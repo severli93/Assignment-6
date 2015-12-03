@@ -42,7 +42,10 @@ queue()
                 x0:centroid[0],
                 y0:centroid[1],
                 x:centroid[0],
-                y:centroid[1]
+                y:centroid[1],
+                //radius:scaleR((popByState.get(d.state)).pop)
+                r:scaleR( (popByState.get(d.properties.STATE)).pop )
+                //r:10
             }
         });
         console.log(data);
@@ -85,7 +88,7 @@ queue()
         //force layout
         var force = d3.layout.force()
             .size([width,height])
-            .charge(-60)
+            //.charge(-60)
             .gravity(0);
 
         force.nodes(data)
@@ -120,7 +123,6 @@ queue()
             nodes = map.selectAll('.state')
             nodes
                 .each(gravity(e.alpha*(0.1)))
-                //.each(collide(.1))
 
                 .attr('transform',function(d){
                     //console.log('here is d',d)
