@@ -20,7 +20,7 @@ var popByState = d3.map();
 
 //Scales
 var scaleR = d3.scale.sqrt().range([5,130]),
-    scaleColor = d3.scale.linear().domain([70,90]).range(['white','red']);
+    scaleColor = d3.scale.log().domain([70,90]).range(['white','red']);
 
 //import data
 queue()
@@ -35,7 +35,7 @@ queue()
         //construct a new array of data
         var data = states.features.map(function(d){
             var centroid = path.centroid(d); //provides two numbers [x,y] indicating the screen coordinates of the state
-            console.log("d is",d)
+            console.log("previously, d is",d)
             return {
                 fullName:d.properties.NAME,
                 state:d.properties.STATE,
@@ -47,8 +47,9 @@ queue()
                 r:scaleR( (popByState.get(d.properties.STATE)).pop )
                 //r:10
             }
+
         });
-        console.log(data);
+        console.log("currently, data is",data)
 
 		var nodes = map.selectAll('.state')
             .data(data, function(d){return d.state
@@ -78,7 +79,8 @@ queue()
         nodes
             .append('text')
             .text(function(d){
-                return d.name;
+                console.log("d is",d)
+                return d.fullName;
             })
             .attr('text-anchor','middle');
 

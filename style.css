@@ -36,10 +36,10 @@ p, svg text{
 /*------------map-------------*/
 .state circle{
     fill:rgba(180,180,180,.1);
-    stroke:rgb(80,80,80);
-    stroke-width:1px;
+    /*stroke:rgb(80,80,80);*/
+    /*stroke-width:1px;*/
 }
 .state text{
     fill:rgb(80,80,80);
-    font-size:10px;
+    font-size:12px;
 }
